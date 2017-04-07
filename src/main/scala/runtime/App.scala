@@ -1,10 +1,9 @@
-import chapter2.{Exercise2_4, Exercise2_5}
+import chapter3.Exercise3_1
 
 object App {
 
   def main(args: Array[String]): Unit = {
-    Exercise2_4.main()
-    Exercise2_5.main()
+    Exercise3_1.main()
   }
 }
 
