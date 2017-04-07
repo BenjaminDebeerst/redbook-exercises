@@ -10,13 +10,10 @@ object Exercise2_2 {
   }
 
   def isSorted[A](as: Array[A], ordered: (A, A) => Boolean): Boolean = {
-    // this could be something like this:
-//    as match {
-//      case a1 :: a2 :: tail => (ordered(a1, a2) && isSorted(Array(a2, tail), ordered))
-//      case _ => true
-//    }
-    if(as.length < 2) true
-    else ordered(as(0), as(1)) && isSorted(as.slice(1, as.length), ordered)
+    as match {
+      case Array(a1, a2, _*) => ordered(a1,a2) && isSorted(as.slice(1,as.length), ordered)
+      case _ => true
+    }
   }
 
 }
