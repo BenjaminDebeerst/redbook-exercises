@@ -2,11 +2,23 @@ package chapter3
 
 object Exercise3_7 {
 
+
   def main(): Unit = {
-    //    println(sum(List(1, 2, 3, 4)))
-    //    println(product(List(1, 2, 3, 4)))
-    //    println(exceptionalProduct(List(1,2,3,4)))
-    println(exceptionalProduct(List(1, 2, 0, 4)))
+    val intList = List(1,2,3,4)
+    val doubleList = List(1.0,5.0,10.0)
+//
+//    println(sum(intList))
+//    println(product(doubleList))
+//    println(length(intList))
+//    println(length(doubleList))
+//
+//    println(sumLeft(intList))
+//    println(productLeft(doubleList))
+//    println(lengthLeft(intList))
+//    println(lengthLeft(doubleList))
+
+    println(reverseRight(intList))
+
 
   }
 
@@ -22,6 +34,18 @@ object Exercise3_7 {
     }
   }
 
+  @annotation.tailrec
+  def foldLeft[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
+    l match {
+      case Nil => z
+      case Cons(h, t) => foldLeft(t, f(z, h))(f)
+    }
+  }
+
+  def sumLeft(ints: List[Int]): Int = foldLeft(ints, 0)(_ + _ )
+  def productLeft(ints: List[Double]): Double = foldLeft(ints, 1.0)(_ * _ )
+  def lengthLeft[A](as: List[A]): Int = foldLeft(as, 0)( (count, _) => (count + 1) )
+
 
   // Exercise 3.7.
   /* Because the recursion is done by foldRight, there is no way to halt pre-emptively
@@ -31,6 +55,9 @@ object Exercise3_7 {
   it. This is not really functional though.
 
   Functional approach: let the multiply function return an optional result. Option.None exits calculations.
+
+  Option B: use lazy evaluation of B, changing the signature of foldRight as well:
+            def foldRight[A, B](l: List[A], z: B)(f: (A, => B) => B): B
    */
   def exceptionalFoldRight[A, B](l: List[A], z: B)(f: (A, B) => Option[B]): Option[B] = {
     l match {
@@ -59,5 +86,65 @@ object Exercise3_7 {
       Some(a * b)
     }
   }
+
+  // Exercise 3.8
+  /*
+   The output is equal to the input. So the data constructors of List can be expressed as a foldRight expression, they are the same
+   */
+
+  // Exercise 3.9
+  def length[A](as: List[A]): Int = foldRight(as, 0)((_, i) => i + 1)
+
+  def provokeStackOverflow() = {
+    def createBigList(): List[Int] = {
+      def append(l: List[Int], n: Int): List[Int] = {
+        if (n < 1) Nil
+        else Cons(1, append(l, n - 1))
+      }
+
+      append(List(), 1000000000)
+    }
+
+    sum(createBigList())
+  }
+
+
+  // Exercise 3.12
+  def reverse[A](as: List[A]): List[A] = {
+    foldRight(as, Nil:List[A])( (e , l) => concat(l, Cons(e, Nil)) )
+  }
+
+  // Exercise 3.13
+//  def reverseRight[A](as: List[A]): List[A] = {
+//    foldLeftInTermsOfFoldRight(as, Nil:List[A])( (t, h) => Cons(h, reverse(t)))
+//  }
+
+  def concat[A](l1: List[A], l2: List[A]): List[A] = {
+    l1 match {
+      case Cons(a, as) => Cons(a, concat(as, l2))
+      case Nil => l2
+    }
+  }
+
+//  def foldLeftInTermsOfFoldRight[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
+//    def swapArguments[A, B](f:(B, A) => B): ((A, B) => B) = {
+//      (b, a) => f(a, b)
+//    }
+//
+//    def merge[A, B]( f:(B, A) => B, g:(B, A) => B ): (B, A) => B = {
+//      (b: B, a: A) =>
+//        g(f(b, a), a)
+//    }
+//
+//    val reverser = (e: A , ls: List[A]) => concat(ls, Cons(e, Nil))
+//    val inversed_f = swapArguments(f)
+//
+//    val reversed = foldRight(l, Nil:List[A])( reverser )
+//    foldRight(reversed, z)(swapArguments(f))
+//
+//    // TODO does not compile yet
+//    foldRight(l, z)(merge())
+//  }
+
 
 }
