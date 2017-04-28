@@ -4,11 +4,14 @@ object Exercise3_7 {
 
 
   def main(): Unit = {
-    val list1 = List(1,2,3,4)
-    val list2 = List(5,6,7,8)
-
-    println(normalAppend(list1, list2))
-    println(appendWithFoldRight(list1, list2))
+    val lists = List(
+      List(1, 2, 3),
+      List(4),
+      List(5, 6, 7, 8),
+      List(9, 10)
+    )
+    println(flattenNonLinear(lists))
+    println(flattenLinear(lists))
   }
 
 
@@ -31,9 +34,11 @@ object Exercise3_7 {
     }
   }
 
-  def sumLeft(ints: List[Int]): Int = foldLeft(ints, 0)(_ + _ )
-  def productLeft(ints: List[Double]): Double = foldLeft(ints, 1.0)(_ * _ )
-  def lengthLeft[A](as: List[A]): Int = foldLeft(as, 0)( (count, _) => (count + 1) )
+  def sumLeft(ints: List[Int]): Int = foldLeft(ints, 0)(_ + _)
+
+  def productLeft(ints: List[Double]): Double = foldLeft(ints, 1.0)(_ * _)
+
+  def lengthLeft[A](as: List[A]): Int = foldLeft(as, 0)((count, _) => (count + 1))
 
 
   // Exercise 3.7.
@@ -85,10 +90,11 @@ object Exercise3_7 {
   def length[A](as: List[A]): Int = foldRight(as, 0)((_, i) => i + 1)
 
   def provokeStackOverflow() = {
-      def append(l: List[Int], n: Int): List[Int] = {
-        if (n < 1) Nil
-        else Cons(1, append(l, n - 1))
-      }
+    def append(l: List[Int], n: Int): List[Int] = {
+      if (n < 1) Nil
+      else Cons(1, append(l, n - 1))
+    }
+
     def createBigList(): List[Int] = {
 
       append(List(), 1000000000)
@@ -100,13 +106,13 @@ object Exercise3_7 {
 
   // Exercise 3.12
   def reverse[A](as: List[A]): List[A] = {
-    foldRight(as, Nil:List[A])( (e , l) => concat(l, Cons(e, Nil)) )
+    foldRight(as, Nil: List[A])((e, l) => concat(l, Cons(e, Nil)))
   }
 
   // Exercise 3.13
-//  def reverseRight[A](as: List[A]): List[A] = {
-//    foldLeftInTermsOfFoldRight(as, Nil:List[A])( (t, h) => Cons(h, reverse(t)))
-//  }
+  //  def reverseRight[A](as: List[A]): List[A] = {
+  //    foldLeftInTermsOfFoldRight(as, Nil:List[A])( (t, h) => Cons(h, reverse(t)))
+  //  }
 
   def concat[A](l1: List[A], l2: List[A]): List[A] = {
     l1 match {
@@ -115,36 +121,50 @@ object Exercise3_7 {
     }
   }
 
-//  def foldLeftInTermsOfFoldRight[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
-//    def swapArguments[A, B](f:(B, A) => B): ((A, B) => B) = {
-//      (b, a) => f(a, b)
-//    }
-//
-//    def merge[A, B]( f:(B, A) => B, g:(B, A) => B ): (B, A) => B = {
-//      (b: B, a: A) =>
-//        g(f(b, a), a)
-//    }
-//
-//    val reverser = (e: A , ls: List[A]) => concat(ls, Cons(e, Nil))
-//    val inversed_f = swapArguments(f)
-//
-//    val reversed = foldRight(l, Nil:List[A])( reverser )
-//    foldRight(reversed, z)(swapArguments(f))
-//
-//    // TODO does not compile yet
-//    foldRight(l, z)(merge())
-//  }
+  //  def foldLeftInTermsOfFoldRight[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
+  //    def swapArguments[A, B](f:(B, A) => B): ((A, B) => B) = {
+  //      (b, a) => f(a, b)
+  //    }
+  //
+  //    def merge[A, B]( f:(B, A) => B, g:(B, A) => B ): (B, A) => B = {
+  //      (b: B, a: A) =>
+  //        g(f(b, a), a)
+  //    }
+  //
+  //    val reverser = (e: A , ls: List[A]) => concat(ls, Cons(e, Nil))
+  //    val inversed_f = swapArguments(f)
+  //
+  //    val reversed = foldRight(l, Nil:List[A])( reverser )
+  //    foldRight(reversed, z)(swapArguments(f))
+  //
+  //    // TODO does not compile yet
+  //    foldRight(l, z)(merge())
+  //  }
 
   // Exercise 3.14
   def normalAppend[A](l1: List[A], l2: List[A]): List[A] = {
     l1 match {
       case Nil => l2
-      case Cons(h, t) => Cons(h, normalAppend(t,  l2))
+      case Cons(h, t) => Cons(h, normalAppend(t, l2))
     }
   }
 
   def appendWithFoldRight[A](l1: List[A], l2: List[A]): List[A] = {
     foldRight(l1, l2)((e, l) => Cons(e, l))
+  }
+
+  // Exercise 3.15
+  // add print to concat to show (non)linearness
+  def flattenNonLinear[A](mountains: List[List[A]]): List[A] = {
+    foldLeft[List[A], List[A]](mountains, List())((flattened, nextList) => {
+      concat(flattened, nextList)
+    })
+  }
+
+  def flattenLinear[A](mountains: List[List[A]]): List[A] = {
+    foldRight[List[A], List[A]](mountains, List())((nextList, flattened) => {
+      concat(nextList, flattened)
+    })
   }
 
 
