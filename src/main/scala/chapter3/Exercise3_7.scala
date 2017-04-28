@@ -4,22 +4,11 @@ object Exercise3_7 {
 
 
   def main(): Unit = {
-    val intList = List(1,2,3,4)
-    val doubleList = List(1.0,5.0,10.0)
-//
-//    println(sum(intList))
-//    println(product(doubleList))
-//    println(length(intList))
-//    println(length(doubleList))
-//
-//    println(sumLeft(intList))
-//    println(productLeft(doubleList))
-//    println(lengthLeft(intList))
-//    println(lengthLeft(doubleList))
+    val list1 = List(1,2,3,4)
+    val list2 = List(5,6,7,8)
 
-    println(reverseRight(intList))
-
-
+    println(normalAppend(list1, list2))
+    println(appendWithFoldRight(list1, list2))
   }
 
 
@@ -96,11 +85,11 @@ object Exercise3_7 {
   def length[A](as: List[A]): Int = foldRight(as, 0)((_, i) => i + 1)
 
   def provokeStackOverflow() = {
-    def createBigList(): List[Int] = {
       def append(l: List[Int], n: Int): List[Int] = {
         if (n < 1) Nil
         else Cons(1, append(l, n - 1))
       }
+    def createBigList(): List[Int] = {
 
       append(List(), 1000000000)
     }
@@ -145,6 +134,18 @@ object Exercise3_7 {
 //    // TODO does not compile yet
 //    foldRight(l, z)(merge())
 //  }
+
+  // Exercise 3.14
+  def normalAppend[A](l1: List[A], l2: List[A]): List[A] = {
+    l1 match {
+      case Nil => l2
+      case Cons(h, t) => Cons(h, normalAppend(t,  l2))
+    }
+  }
+
+  def appendWithFoldRight[A](l1: List[A], l2: List[A]): List[A] = {
+    foldRight(l1, l2)((e, l) => Cons(e, l))
+  }
 
 
 }
