@@ -1,6 +1,6 @@
 package chapter3
 
-object Exercise3_7 {
+object Exercise3_7_to_3_15 {
 
 
   def main(): Unit = {

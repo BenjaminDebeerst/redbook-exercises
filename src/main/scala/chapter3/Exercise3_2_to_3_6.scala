@@ -2,7 +2,7 @@ package chapter3
 
 import List._
 
-object Exercises3_2_to_3_6 {
+object Exercise3_2_to_3_6 {
 
 
   def main(): Unit = {
