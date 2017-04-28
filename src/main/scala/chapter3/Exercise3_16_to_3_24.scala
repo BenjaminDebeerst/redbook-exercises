@@ -10,9 +10,9 @@ object Exercise3_16_to_3_24 {
     println(filterWithFlatMap(list, (i: Int) => i%2==1))
     println(flatMap(List(1,2,3))(e => List(e,e)))
 
-    println(vectorAdd(List(1,2,3), List(1,2,3)))
-    println(vectorAdd(List(1,2,3), List(1,2,3,0)))
-    println(vectorAdd(List(1,2,3,0), List(1,2,3)))
+    println(zipWith(List(1,2,3), List(1,2,3))(_+_))
+    println(zipWith(List(1,2,3), List(1,2,3,0))(_+_))
+    println(zipWith(List(1,2,3,0), List(1,2,3))(_+_))
   }
 
   // Exercise 3.16 - 3.18
@@ -45,13 +45,13 @@ object Exercise3_16_to_3_24 {
     flatMap(list)(a => if(predicate(a)) List() else List(a))
   }
 
-  // Exercise 3.22
-  def vectorAdd(l1: List[Int], l2: List[Int]): List[Int] = {
+  // Exercise 3.22 & 3.23
+  def zipWith[A](l1: List[A], l2: List[A])(f: (A, A) => A): List[A] = {
     (l1, l2) match {
       case (Nil, Nil) => Nil
       case (Nil, Cons(h, t)) => Cons(h, t)
       case (Cons(h, t), Nil) => Cons(h, t)
-      case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1+h2, vectorAdd(t1, t2))
+      case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1,h2), zipWith(t1, t2)(f))
     }
   }
 
