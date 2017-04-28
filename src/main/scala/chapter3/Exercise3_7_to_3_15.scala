@@ -4,14 +4,12 @@ object Exercise3_7_to_3_15 {
 
 
   def main(): Unit = {
-    val lists = List(
-      List(1, 2, 3),
-      List(4),
-      List(5, 6, 7, 8),
-      List(9, 10)
-    )
-    println(flattenNonLinear(lists))
-    println(flattenLinear(lists))
+    val intList = List(1, 2, 3, 4)
+
+    println(intList)
+    println(foldLeft(intList, 1)((a, b) => (a + 1) * b))
+    println(foldRight(intList, 1)((a, b) => (a + 1) * b))
+    println(foldLeftInTermsOfFoldRight(intList, 1)((a, b) => (a + 1) * b))
   }
 
 
@@ -109,11 +107,6 @@ object Exercise3_7_to_3_15 {
     foldRight(as, Nil: List[A])((e, l) => concat(l, Cons(e, Nil)))
   }
 
-  // Exercise 3.13
-  //  def reverseRight[A](as: List[A]): List[A] = {
-  //    foldLeftInTermsOfFoldRight(as, Nil:List[A])( (t, h) => Cons(h, reverse(t)))
-  //  }
-
   def concat[A](l1: List[A], l2: List[A]): List[A] = {
     l1 match {
       case Cons(a, as) => Cons(a, concat(as, l2))
@@ -121,25 +114,14 @@ object Exercise3_7_to_3_15 {
     }
   }
 
-  //  def foldLeftInTermsOfFoldRight[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
-  //    def swapArguments[A, B](f:(B, A) => B): ((A, B) => B) = {
-  //      (b, a) => f(a, b)
-  //    }
-  //
-  //    def merge[A, B]( f:(B, A) => B, g:(B, A) => B ): (B, A) => B = {
-  //      (b: B, a: A) =>
-  //        g(f(b, a), a)
-  //    }
-  //
-  //    val reverser = (e: A , ls: List[A]) => concat(ls, Cons(e, Nil))
-  //    val inversed_f = swapArguments(f)
-  //
-  //    val reversed = foldRight(l, Nil:List[A])( reverser )
-  //    foldRight(reversed, z)(swapArguments(f))
-  //
-  //    // TODO does not compile yet
-  //    foldRight(l, z)(merge())
-  //  }
+  // Exercise 3.13
+  def foldLeftInTermsOfFoldRight[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
+    def id(b: B): B = b
+    def g(a: A, h:B=>B):(B=>B) = {
+      c:B => h(f(c, a))
+    }
+    foldRight[A, B=>B](l, id)(g)(z)
+  }
 
   // Exercise 3.14
   def normalAppend[A](l1: List[A], l2: List[A]): List[A] = {
@@ -166,6 +148,5 @@ object Exercise3_7_to_3_15 {
       concat(nextList, flattened)
     })
   }
-
 
 }
