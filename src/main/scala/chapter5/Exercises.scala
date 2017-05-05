@@ -1,47 +1,40 @@
 package chapter5
 
+import Stream.cons
+
 object Exercises {
   def main(): Unit = {
-    val stream1: Stream[Int] = Cons(() => 1, () => Cons(() => {
-      println("2");
-      2
-    }, () => Stream(3, 4, 5)))
-    println(stream1.take(3).toList())
+    val s = Stream(1,2,3,4,5,6)
 
-    println(stream1.drop(2).toList())
+    println(s.takeWhile(_%3 == 1).toList())
+    println(s.map(i => (i+10).toString() + "'").toList())
+    println(s.take(3).toList())
 
-    println(stream1.dropWhile(_ % 2 == 1))
-    println(stream1.dropWhile(_ % 2 == 0))
-    println(stream1.dropWhile(_ % 2 == 0))
+    val s2 = Stream(10, 11, 12, 13)
 
-    println("=====")
+    println(Stream.zipWith(s, s2)(_ + _).toList())
+    println(Stream.zipAll(s,s2).toList())
 
-    println(stream1.forAll(_ < 1))
-    println(stream1.forAll(_ > 0))
+    println("====================")
 
-    println("-----")
-    val stream2 = Stream(1, 2, 3, 4, 5, 6)
-    println(stream2.takeWhile(_ % 2 == 0).toList())
-    println(stream1.takeWhile(_ % 2 == 0))
-    println(stream1.takeWhile(_ % 2 == 1))
+    val a = Stream(1,2,3,4,5,6)
+    val b = Stream(1,2,3)
+    println(a startsWith b)
+    println(b startsWith a)
+    println(b startsWith a.take(3))
+    println(a startsWith Empty)
 
-    println(Stream(1, 2, 3, 4).headOption())
-    println(Stream().headOption())
+    println("====================")
 
-    println(stream1.map(i => {
-      println("sum");
-      i + 2
-    }))
+    val c = cons(1, cons(2, Cons(() => 3, () => Cons(() => {println("4"); 4}, () => Empty))))
+    println(c startsWith Stream(1,2))
+    println(c startsWith Stream(1,2,3))
 
-    println("----")
+    println("====================")
+    println(c.exists(_>2))
+    println(a.tails.map(_.toList()).toList())
 
-    println(Stream.constant("c").take(5).toList())
-    println(Stream.from(10).take(5).toList())
-    println(Stream.fib().take(7).toList())
-
-    val fibs = Stream.unfold[Int, (Int, Int)]((0, 1)) {
-        case (n1, n2) => Some((n1, (n2, n1+n2)))
-    }
-    println(fibs.take(7).toList())
+    println(c hasSubSequence Stream(1,2,23))
+    
   }
 }
