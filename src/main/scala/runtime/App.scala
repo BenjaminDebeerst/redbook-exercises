@@ -1,4 +1,4 @@
-import chapter5.Exercises
+import chapter6.Exercises
 
 object App {
 
