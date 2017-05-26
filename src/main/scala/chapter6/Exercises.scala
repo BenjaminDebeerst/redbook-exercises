@@ -7,42 +7,26 @@ object Exercises {
     printN[RNG, Int](
       10,
       SimpleRNG(42),
-      rng => nonNegativeEven(rng)
+      rng => nonNegativeLessThan(100)(rng)
     )
-    println("--")
-    printN[RNG, Double](
-      2,
-      SimpleRNG(23),
-      rng => doubleWithMap(rng)
-    )
-    printN[RNG, Double](
-      2,
-      SimpleRNG(23),
-      rng => double(rng)
-    )
-
-    println("--")
-    printN[RNG, (Int, Double)](
-      2,
-      SimpleRNG(23),
-      rng => intDoubleWithMap(rng)
-    )
-    printN[RNG, (Int, Double)](
-      2,
-      SimpleRNG(23),
-      rng => intDouble(rng)
-    )
-
     println("---")
-
-    printN[RNG, List[Int]](
-      10,
-      SimpleRNG(23),
-      sequence[Int](List(_.nextInt, nonNegativeEven, nonNegativeInt))
+    printN[RNG, Int](
+      5,
+      SimpleRNG(42),
+      rng => rng.nextInt
     )
-
-    println(ints(10)(SimpleRNG(23)))
-    println(intsWithSequence(10)(SimpleRNG(23)))
+    printN[RNG, String](
+      5,
+      SimpleRNG(42),
+      rng => mapWithFlatMap(_.nextInt)({i: Int => "+" + i})(rng)
+    )
+    println("----")
+    printN[RNG, Int](6, SimpleRNG(42), rng => rng.nextInt)
+    printN[RNG, (Int, Int)](
+      3,
+      SimpleRNG(42),
+      rng => map2WithFlatMap(_.nextInt, _.nextInt)((_, _))(rng)
+    )
   }
 
   def printN[A, B](n: Int, seed: A, next: A => (B, A), printer: B => Unit = println(_: B)): Unit = {
@@ -82,6 +66,9 @@ object Exercises {
     }
   }
 
+  def mapWithFlatMap[A, B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(a => (f(a), _))
+
   def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
     rng => {
       val (a, rng2) = ra(rng)
@@ -90,9 +77,30 @@ object Exercises {
     }
   }
 
+  def map2WithFlatMap[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra)(a => flatMap(rb)(b => (f(a, b), _))) 
+
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
     fs.foldRight(unit(List[A]()))( (ra, rl) => map2(ra, rl)( _ :: _) )
   }
+
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = {
+    rng => {
+      val (a, nextRng) = f(rng)
+      g(a)(nextRng)
+    }
+  }
+
+  def nonNegativeLessThan(n: Int): Rand[Int] =
+    flatMap(nonNegativeInt)({
+      i: Int => {
+        val mod = i % n
+        if ((i + (n-1) - mod) >= 0)
+          (mod, _)
+        else
+          nonNegativeLessThan(n)
+      }
+    })
 
   def intsWithSequence(count: Int) = sequence(List.fill(count)(int))
 
