@@ -1,4 +1,4 @@
-import chapter6.Exercise6_10.run
+import chapter6.CandyMachine.run
 
 object App {
 
