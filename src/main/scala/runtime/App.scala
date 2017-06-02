@@ -1,4 +1,4 @@
-import chapter6.CandyMachine.run
+import chapter7.Parallelism.run
 
 object App {
 
